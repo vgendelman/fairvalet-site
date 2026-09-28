@@ -291,10 +291,12 @@
         root.innerHTML = reports.map((r) => {
           const typeLabel = TYPE_LABELS[r.type] || r.type || "Report";
           const when = formatDate(r.published_at || r.submitted_at);
+          const who = r.name ? escapeHtml(r.name) : "";
           return (
             '<article class="story">' +
               "<strong>" + escapeHtml(r.venue || "Venue") + "</strong>" +
               '<span class="report-meta">' +
+                (who ? who + " · " : "") +
                 escapeHtml(r.location || "") +
                 (r.location && typeLabel ? " · " : "") +
                 escapeHtml(typeLabel) +

@@ -25,7 +25,7 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 | Published | `data/reports.json` → rendered in “Community reports” on https://fairvalet.org/ |
 | Rejected | Closed issues (`rejected`) |
 
-Public JSON fields only: `id`, `venue`, `location`, `type`, `details`, `submitted_at`, `published_at`, `issue_number`. Never put private email in that file.
+Public JSON fields only: `id`, `name`, `venue`, `location`, `type`, `details`, `submitted_at`, `published_at`, `issue_number`. Never put private email in that file.
 
 ## Intake token (privacy / spam note)
 
