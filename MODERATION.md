@@ -22,7 +22,7 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 | Stage | Location |
 | --- | --- |
 | Pending | GitHub Issues (`pending-report`) |
-| Published | `data/reports.json` → rendered in “Community reports” on https://fairvalet.org/ |
+| Published | `data/reports.json` → rendered on https://fairvalet.org/reports/ |
 | Rejected | Closed issues (`rejected`) |
 
 Public JSON fields only: `id`, `name`, `venue`, `location`, `type`, `details`, `submitted_at`, `published_at`, `issue_number`. Never put private email in that file.

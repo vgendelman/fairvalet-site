@@ -156,7 +156,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: 'Published to the site. It should appear on https://fairvalet.org/ after GitHub Pages rebuilds.'
+              body: 'Published to the site. It should appear on https://fairvalet.org/reports/ after GitHub Pages rebuilds.'
             });
 
             const email = String(payload.email || '').trim();
@@ -180,7 +180,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Accept: application/json" \
             --data-binary @- <<JSON || echo "FormSubmit confirmation failed (may need first-time activation)."
-          {"_subject":"FairValet: your report was published","message":"Thanks — your FairValet report about ${VENUE} was reviewed and published at https://fairvalet.org/.","_template":"table"}
+          {"_subject":"FairValet: your report was published","message":"Thanks — your FairValet report about ${VENUE} was reviewed and published at https://fairvalet.org/reports/.","_template":"table"}
           JSON
 
       - name: Reject report
