@@ -1,13 +1,1 @@
-[
-  {
-    "id": "r-1-test",
-    "name": "TEST Synthetic User",
-    "venue": "TEST Synthetic Cafe",
-    "location": "Testville, AZ",
-    "type": "other",
-    "details": "TEST ONLY \u2014 synthetic moderation pipeline check. Safe to delete.",
-    "submitted_at": "2026-09-28T22:00:00.000Z",
-    "published_at": "2026-09-28T22:22:23.190Z",
-    "issue_number": 1
-  }
-]
+[]

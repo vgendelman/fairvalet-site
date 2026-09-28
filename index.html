@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FairValet — Valet should save you a walk</title>
   <meta name="description" content="FairValet is a consumer movement for fair valet parking. Valet should save you a walk, not make everyone else walk farther." />
+  <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/assets/favicon-16.png" type="image/png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
@@ -15,8 +18,8 @@
       --line: #e4e7ee;
       --bg: #fafbfc;
       --card: #ffffff;
-      --accent: #0f6e56;
-      --accent-soft: #e6f4ef;
+      --accent: #0179d6;
+      --accent-soft: #e8f3fc;
       --warn: #8a4b08;
     }
     * { box-sizing: border-box; }
@@ -169,6 +172,28 @@
       margin-top: 0.35rem;
     }
     .report-details { margin: 0.45rem 0 0; font-size: 0.95rem; }
+
+    a { color: var(--accent); }
+    .reports-cta {
+      display: block;
+      text-align: center;
+      margin: 0.35rem 0 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .reports-cta:hover { text-decoration: underline; }
+    .header-nav {
+      margin: 1rem 0 0;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    .header-nav a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .header-nav a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -179,6 +204,7 @@
       </a>
       <h1>Valet should save you a walk — not make everyone else walk farther.</h1>
       <p class="lede">A consumer movement for fair valet parking at restaurants, hotels, malls, and venues.</p>
+      <p class="header-nav"><a href="/reports/">Read published reports</a></p>
     </header>
 
     <section>
@@ -234,13 +260,8 @@
       </form>
     </section>
 
-    <section>
-      <h2>Community reports</h2>
-      <p class="note" style="margin-top:0">Published only after moderator review. Email addresses are never shown.</p>
-      <div class="stories" id="community-reports">
-        <p class="note" id="reports-empty" style="margin:0">No published reports yet.</p>
-      </div>
-    </section>
+    <p class="reports-cta"><a class="reports-cta" href="/reports/">Read published reports →</a></p>
+
 
     <footer>
       FairValet · Consumer movement for fair parking · fairvalet.org
@@ -248,70 +269,6 @@
   </div>
   <script src="assets/intake-config.js" onerror="console.warn('FairValet intake config not loaded')"></script>
   <script>
-    const TYPE_LABELS = {
-      front_spaces_reserved: "Best spots reserved for valet cars",
-      forced_or_pushed: "Felt forced into valet / little self-park choice",
-      cones_or_blocked: "Cones or barriers blocking ordinary parking",
-      parked_far_anyway: "Paid valet but car still parked far away",
-      good_example: "They do valet fairly — recognize them",
-      other: "Something else"
-    };
-
-    function escapeHtml(s) {
-      return String(s)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    function formatDate(iso) {
-      if (!iso) return "";
-      try {
-        return new Date(iso).toLocaleDateString(undefined, {
-          year: "numeric", month: "short", day: "numeric"
-        });
-      } catch (_) {
-        return iso;
-      }
-    }
-
-    async function loadCommunityReports() {
-      const root = document.getElementById("community-reports");
-      const empty = document.getElementById("reports-empty");
-      try {
-        const res = await fetch("data/reports.json", { cache: "no-store" });
-        if (!res.ok) throw new Error("fetch failed");
-        const reports = await res.json();
-        if (!Array.isArray(reports) || reports.length === 0) {
-          if (empty) empty.textContent = "No published reports yet.";
-          return;
-        }
-        if (empty) empty.remove();
-        root.innerHTML = reports.map((r) => {
-          const typeLabel = TYPE_LABELS[r.type] || r.type || "Report";
-          const when = formatDate(r.published_at || r.submitted_at);
-          const who = r.name ? escapeHtml(r.name) : "";
-          return (
-            '<article class="story">' +
-              "<strong>" + escapeHtml(r.venue || "Venue") + "</strong>" +
-              '<span class="report-meta">' +
-                (who ? who + " · " : "") +
-                escapeHtml(r.location || "") +
-                (r.location && typeLabel ? " · " : "") +
-                escapeHtml(typeLabel) +
-                (when ? " · " + escapeHtml(when) : "") +
-              "</span>" +
-              '<p class="report-details">' + escapeHtml(r.details || "") + "</p>" +
-            "</article>"
-          );
-        }).join("");
-      } catch (err) {
-        if (empty) empty.textContent = "No published reports yet.";
-        console.warn("Could not load community reports", err);
-      }
-    }
-
     async function createReviewIssue(fields) {
       const cfg = window.FAIRVALET_INTAKE;
       if (!cfg || !cfg.token || !cfg.owner || !cfg.repo) {
@@ -420,7 +377,6 @@
       }
     });
 
-    loadCommunityReports();
   </script>
 </body>
 </html>
