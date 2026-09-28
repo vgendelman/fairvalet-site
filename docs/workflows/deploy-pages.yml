@@ -1,0 +1,50 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write intake-config.js from secret (not committed)
+        env:
+          INTAKE_TOKEN: ${{ secrets.FAIRVALET_INTAKE_TOKEN }}
+        run: |
+          mkdir -p assets
+          if [ -z "$INTAKE_TOKEN" ]; then
+            echo "WARNING: FAIRVALET_INTAKE_TOKEN unset; form will skip auto issue creation."
+            printf "window.FAIRVALET_INTAKE={token:'',owner:'vgendelman',repo:'fairvalet-site'};\n" > assets/intake-config.js
+          else
+            # Injected only into the Pages artifact — never committed to git.
+            printf "window.FAIRVALET_INTAKE={token:'%s',owner:'vgendelman',repo:'fairvalet-site'};\n" "$INTAKE_TOKEN" > assets/intake-config.js
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
