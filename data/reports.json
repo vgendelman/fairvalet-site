@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "r-6-1790635679189",
+    "name": "Alex",
+    "venue": "West End",
+    "location": "West Bloomfield, MI",
+    "type": "cones_or_blocked",
+    "details": "A few weeks ago I was meeting friends at West End. When I arrived, all the nearby parking spots were taken up by the valet's cones, leaving only spots far from the restaurant. We turned around and went to a different place.",
+    "submitted_at": "2026-09-28T22:31:24.765Z",
+    "published_at": "2026-09-28T22:47:59.189Z",
+    "issue_number": 6
+  }
+]
