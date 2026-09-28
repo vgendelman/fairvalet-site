@@ -1,0 +1,215 @@
+name: Moderate report
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  moderate:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.issue.pull_request == null &&
+      contains(github.event.issue.labels.*.name, 'pending-report')
+    steps:
+      - name: Check command and author
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const assoc = context.payload.comment.author_association;
+            const allowed = ['OWNER', 'MEMBER', 'COLLABORATOR'];
+            if (!allowed.includes(assoc)) {
+              core.info(`Ignoring comment from association ${assoc}`);
+              core.setOutput('action', 'none');
+              return;
+            }
+            const raw = (context.payload.comment.body || '').trim();
+            const approve = /^approve$/i.test(raw);
+            const rejectMatch = raw.match(/^reject(?:\s+(.+))?$/is);
+            if (!approve && !rejectMatch) {
+              core.info('Comment is not an approve/reject command; ignoring.');
+              core.setOutput('action', 'none');
+              return;
+            }
+            if (approve) {
+              core.setOutput('action', 'approve');
+              core.setOutput('reason', '');
+            } else {
+              core.setOutput('action', 'reject');
+              core.setOutput('reason', (rejectMatch[1] || 'No reason given').trim());
+            }
+
+      - name: Checkout
+        if: steps.gate.outputs.action == 'approve' || steps.gate.outputs.action == 'reject'
+        uses: actions/checkout@v4
+
+      - name: Approve — publish report
+        id: approve
+        if: steps.gate.outputs.action == 'approve'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const labels = (issue.labels || []).map(l => l.name);
+
+            if (labels.includes('published')) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: 'Already published — skipping.'
+              });
+              core.setOutput('confirm_email', '');
+              return;
+            }
+
+            const body = issue.body || '';
+            const jsonMatch = body.match(/<!--\s*fairvalet:json\s*-->\s*([\s\S]*?)\s*<!--\s*\/fairvalet:json\s*-->/);
+            if (!jsonMatch) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: 'Could not parse report JSON from issue body. Expected `<!-- fairvalet:json -->...<!-- /fairvalet:json -->`.'
+              });
+              core.setFailed('Missing fairvalet JSON block');
+              return;
+            }
+
+            let payload;
+            try {
+              payload = JSON.parse(jsonMatch[1].trim());
+            } catch (e) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: 'Report JSON is invalid: ' + e.message
+              });
+              core.setFailed('Invalid JSON');
+              return;
+            }
+
+            const path = 'data/reports.json';
+            let reports = [];
+            if (fs.existsSync(path)) {
+              reports = JSON.parse(fs.readFileSync(path, 'utf8'));
+              if (!Array.isArray(reports)) reports = [];
+            }
+
+            const now = new Date().toISOString();
+            const report = {
+              id: `r-${issueNumber}-${Date.now()}`,
+              name: String(payload.name || '').trim(),
+              venue: String(payload.venue || '').trim(),
+              location: String(payload.location || '').trim(),
+              type: String(payload.type || '').trim(),
+              details: String(payload.details || payload.story || '').trim(),
+              submitted_at: payload.submitted_at || issue.created_at || now,
+              published_at: now,
+              issue_number: issueNumber
+            };
+
+            if (!report.venue || !report.details) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: 'Report is missing required fields (venue/details). Not publishing.'
+              });
+              core.setFailed('Missing required fields');
+              return;
+            }
+
+            reports.unshift(report);
+            fs.writeFileSync(path, JSON.stringify(reports, null, 2) + '\n');
+
+            execSync('git config user.name "github-actions[bot]"');
+            execSync('git config user.email "41898282+github-actions[bot]@users.noreply.github.com"');
+            execSync(`git add ${path}`);
+            const safeVenue = report.venue.replace(/"/g, '').slice(0, 80);
+            execSync(`git commit -m "Publish report #${issueNumber}: ${safeVenue}"`);
+            execSync('git push');
+
+            const keep = labels.filter(n => n !== 'pending-report' && n !== 'rejected');
+            if (!keep.includes('published')) keep.push('published');
+            await github.rest.issues.setLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              labels: keep
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              state: 'closed'
+            });
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: 'Published to the site. It should appear on https://fairvalet.org/reports/ after GitHub Pages rebuilds.'
+            });
+
+            const email = String(payload.email || '').trim();
+            if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              core.setOutput('confirm_email', email);
+              core.setOutput('confirm_venue', report.venue);
+            } else {
+              core.setOutput('confirm_email', '');
+              core.setOutput('confirm_venue', '');
+            }
+
+      - name: Send confirmation email (FormSubmit)
+        if: steps.gate.outputs.action == 'approve' && steps.approve.outputs.confirm_email != ''
+        continue-on-error: true
+        env:
+          EMAIL: ${{ steps.approve.outputs.confirm_email }}
+          VENUE: ${{ steps.approve.outputs.confirm_venue }}
+        run: |
+          # FormSubmit may require a one-time activation click on first use per address.
+          curl -sS -X POST "https://formsubmit.co/ajax/${EMAIL}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            --data-binary @- <<JSON || echo "FormSubmit confirmation failed (may need first-time activation)."
+          {"_subject":"FairValet: your report was published","message":"Thanks — your FairValet report about ${VENUE} was reviewed and published at https://fairvalet.org/reports/.","_template":"table"}
+          JSON
+
+      - name: Reject report
+        if: steps.gate.outputs.action == 'reject'
+        uses: actions/github-script@v7
+        env:
+          REJECT_REASON: ${{ steps.gate.outputs.reason }}
+        with:
+          script: |
+            const reason = process.env.REJECT_REASON || 'No reason given';
+            const issueNumber = context.payload.issue.number;
+            const labels = (context.payload.issue.labels || []).map(l => l.name);
+            const keep = labels.filter(n => n !== 'pending-report' && n !== 'published');
+            if (!keep.includes('rejected')) keep.push('rejected');
+            await github.rest.issues.setLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              labels: keep
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              state: 'closed'
+            });
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `Rejected — not published.\n\n**Reason:** ${reason}`
+            });
