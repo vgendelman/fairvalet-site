@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "r-4-1790634417829",
+    "name": "TEST Pipeline User",
+    "venue": "TEST Pipeline Cafe",
+    "location": "Testville, MI",
+    "type": "other",
+    "details": "TEST ONLY — synthetic moderation check. Delete after.",
+    "submitted_at": "2026-09-28T22:00:00.000Z",
+    "published_at": "2026-09-28T22:26:57.829Z",
+    "issue_number": 4
+  }
+]
