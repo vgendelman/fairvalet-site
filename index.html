@@ -162,6 +162,13 @@
       font-weight: 500;
     }
     .ok.show { display: block; }
+    .report-meta {
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: block;
+      margin-top: 0.35rem;
+    }
+    .report-details { margin: 0.45rem 0 0; font-size: 0.95rem; }
   </style>
 </head>
 <body>
@@ -225,17 +232,10 @@
     </section>
 
     <section>
-      <h2>Stories (opted-in)</h2>
-      <p class="note" style="margin-top:0">Published only with consent, after review. Seed examples below — your reports appear here once verified.</p>
-      <div class="stories" id="stories">
-        <div class="story">
-          <strong>“Valet-only surprise when I pulled up.”</strong>
-          <span>Metro Detroit diner · type: felt forced into valet · awaiting more local reports</span>
-        </div>
-        <div class="story">
-          <strong>“Only a few regular spots — otherwise you must do valet.”</strong>
-          <span>Historical Birmingham review pattern · under review</span>
-        </div>
+      <h2>Community reports</h2>
+      <p class="note" style="margin-top:0">Published only after moderator review. Email addresses are never shown.</p>
+      <div class="stories" id="community-reports">
+        <p class="note" id="reports-empty" style="margin:0">No published reports yet.</p>
       </div>
     </section>
 
@@ -243,7 +243,132 @@
       FairValet · Consumer movement for fair parking · fairvalet.org
     </footer>
   </div>
+  <script src="assets/intake-config.js"></script>
   <script>
+    const TYPE_LABELS = {
+      front_spaces_reserved: "Best spots reserved for valet cars",
+      forced_or_pushed: "Felt forced into valet / little self-park choice",
+      cones_or_blocked: "Cones or barriers blocking ordinary parking",
+      parked_far_anyway: "Paid valet but car still parked far away",
+      good_example: "They do valet fairly — recognize them",
+      other: "Something else"
+    };
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "";
+      try {
+        return new Date(iso).toLocaleDateString(undefined, {
+          year: "numeric", month: "short", day: "numeric"
+        });
+      } catch (_) {
+        return iso;
+      }
+    }
+
+    async function loadCommunityReports() {
+      const root = document.getElementById("community-reports");
+      const empty = document.getElementById("reports-empty");
+      try {
+        const res = await fetch("data/reports.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("fetch failed");
+        const reports = await res.json();
+        if (!Array.isArray(reports) || reports.length === 0) {
+          if (empty) empty.textContent = "No published reports yet.";
+          return;
+        }
+        if (empty) empty.remove();
+        root.innerHTML = reports.map((r) => {
+          const typeLabel = TYPE_LABELS[r.type] || r.type || "Report";
+          const when = formatDate(r.published_at || r.submitted_at);
+          return (
+            '<article class="story">' +
+              "<strong>" + escapeHtml(r.venue || "Venue") + "</strong>" +
+              '<span class="report-meta">' +
+                escapeHtml(r.location || "") +
+                (r.location && typeLabel ? " · " : "") +
+                escapeHtml(typeLabel) +
+                (when ? " · " + escapeHtml(when) : "") +
+              "</span>" +
+              '<p class="report-details">' + escapeHtml(r.details || "") + "</p>" +
+            "</article>"
+          );
+        }).join("");
+      } catch (err) {
+        if (empty) empty.textContent = "No published reports yet.";
+        console.warn("Could not load community reports", err);
+      }
+    }
+
+    async function createReviewIssue(fields) {
+      const cfg = window.FAIRVALET_INTAKE;
+      if (!cfg || !cfg.token || !cfg.owner || !cfg.repo) {
+        console.warn("FairValet intake config missing; email notification still sent.");
+        return;
+      }
+      const submitted_at = new Date().toISOString();
+      const payload = {
+        venue: fields.venue,
+        location: fields.location,
+        type: fields.type,
+        details: fields.story,
+        story: fields.story,
+        email: fields.email || "",
+        consent_public: fields.consent_public,
+        submitted_at
+      };
+      const body = [
+        "## FairValet report (pending review)",
+        "",
+        "| Field | Value |",
+        "| --- | --- |",
+        `| Venue | ${fields.venue} |`,
+        `| Location | ${fields.location} |`,
+        `| Type | ${fields.type} |`,
+        `| Consent to publish | ${fields.consent_public} |`,
+        `| Submitted | ${submitted_at} |`,
+        "",
+        "### Details",
+        "",
+        fields.story,
+        "",
+        "<!-- fairvalet:json -->",
+        JSON.stringify(payload, null, 2),
+        "<!-- /fairvalet:json -->",
+        "",
+        "_Moderator: comment `approve` or `reject <reason>` (collaborators only)._"
+      ].join("\n");
+
+      const res = await fetch(
+        `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/issues`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + cfg.token,
+            Accept: "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28"
+          },
+          body: JSON.stringify({
+            title: `Report: ${fields.venue} (${fields.location})`,
+            body,
+            labels: ["pending-report"]
+          })
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.warn("Could not create review issue", res.status, text);
+      }
+    }
+
     const form = document.getElementById("report");
     const ok = document.getElementById("ok");
     form.addEventListener("submit", async (e) => {
@@ -251,15 +376,31 @@
       const btn = form.querySelector("button");
       btn.disabled = true;
       btn.textContent = "Sending…";
+      const fields = {
+        venue: document.getElementById("venue").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        type: document.getElementById("type").value,
+        story: document.getElementById("story").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        consent_public: document.getElementById("consent").checked ? "yes" : "no"
+      };
       try {
         const data = new FormData(form);
-        data.append("consent_public", document.getElementById("consent").checked ? "yes" : "no");
+        data.set("consent_public", fields.consent_public);
         const res = await fetch(form.action, {
           method: "POST",
           body: data,
           headers: { Accept: "application/json" }
         });
         if (!res.ok) throw new Error("send failed");
+
+        // Best-effort review queue; email path already succeeded.
+        try {
+          await createReviewIssue(fields);
+        } catch (issueErr) {
+          console.warn("Review issue creation failed", issueErr);
+        }
+
         form.reset();
         ok.classList.add("show");
         ok.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -270,6 +411,8 @@
         btn.textContent = "Submit report";
       }
     });
+
+    loadCommunityReports();
   </script>
 </body>
 </html>
