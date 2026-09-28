@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FairValet — Valet should save you a walk</title>
+  <meta name="description" content="FairValet is a consumer movement for fair valet parking. Valet should save you a walk, not make everyone else walk farther." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1f2e;
+      --muted: #5c6578;
+      --line: #e4e7ee;
+      --bg: #fafbfc;
+      --card: #ffffff;
+      --accent: #0f6e56;
+      --accent-soft: #e6f4ef;
+      --warn: #8a4b08;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+      font-size: 1.05rem;
+    }
+    .wrap {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+    header { margin-bottom: 2.5rem; }
+    .mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-size: 1.15rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .mark span {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+    h1 {
+      font-size: clamp(1.75rem, 4.5vw, 2.25rem);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin: 1.25rem 0 0.75rem;
+      font-weight: 700;
+    }
+    .lede {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin: 0;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.5rem 1.35rem;
+      margin-bottom: 1.25rem;
+    }
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 0.85rem;
+      letter-spacing: -0.01em;
+    }
+    p { margin: 0 0 0.9rem; }
+    p:last-child { margin-bottom: 0; }
+    .quote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+      margin: 1.1rem 0 0;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: 0 0 0.35rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 0.55rem;
+      padding: 0.7rem 0.8rem;
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+      margin-bottom: 1rem;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+    textarea { min-height: 7rem; resize: vertical; }
+    .check {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      margin: 0.25rem 0 1.15rem;
+      font-size: 0.95rem;
+    }
+    .check input {
+      margin-top: 0.3rem;
+      width: 1.05rem;
+      height: 1.05rem;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+    button {
+      appearance: none;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.8rem 1.25rem;
+      border-radius: 0.55rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { filter: brightness(1.05); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.85rem;
+    }
+    .stories { display: grid; gap: 0.85rem; }
+    .story {
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      padding: 0.9rem 1rem;
+      background: var(--bg);
+    }
+    .story strong { display: block; margin-bottom: 0.25rem; font-size: 0.95rem; }
+    .story span { color: var(--muted); font-size: 0.85rem; }
+    footer {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .ok {
+      display: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .ok.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="mark" href="#"><span></span> FairValet</a>
+      <h1>Valet should save you a walk — not make everyone else walk farther.</h1>
+      <p class="lede">A consumer movement for fair valet parking at restaurants, hotels, malls, and venues.</p>
+    </header>
+
+    <section>
+      <h2>The problem</h2>
+      <p>You arrive at a restaurant or venue ready to park yourself. The best spots by the door are coned off or filled with valet-stored cars. So you walk farther — or feel pushed into paying for valet.</p>
+      <p>Ironically, when the valet lot fills up, your car often ends up parked far away anyway. The “convenience” mostly serves the business’s curb appeal, not you.</p>
+      <p>We’re not anti-valet. Drop-off and pickup should stay close to the entrance. After that, valet cars should generally be stored in the less-convenient spaces — leaving ordinary front parking for people who park themselves.</p>
+      <p class="quote">“Valet should save you a walk, not make everyone else walk farther.”</p>
+    </section>
+
+    <section>
+      <h2>Share your experience</h2>
+      <p>Seen valet hogging the front spaces — or a place that does it right? Tell us. It takes under a minute.</p>
+      <div id="ok" class="ok" role="status">Thanks — your report was sent. If you opted in, we may publish it after a quick review.</div>
+      <form id="report" action="https://formsubmit.co/ajax/Vgnoid@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="FairValet report" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+
+        <label for="venue">Business / venue</label>
+        <input id="venue" name="venue" type="text" required placeholder="e.g. Hyde Park Prime, Birmingham" />
+
+        <label for="location">City / location</label>
+        <input id="location" name="location" type="text" required placeholder="City, state or ZIP" />
+
+        <label for="type">What happened?</label>
+        <select id="type" name="type" required>
+          <option value="">Choose one…</option>
+          <option value="front_spaces_reserved">Best spots reserved for valet cars</option>
+          <option value="forced_or_pushed">Felt forced into valet / little self-park choice</option>
+          <option value="cones_or_blocked">Cones or barriers blocking ordinary parking</option>
+          <option value="parked_far_anyway">Paid valet but car still parked far away</option>
+          <option value="good_example">They do valet fairly — recognize them</option>
+          <option value="other">Something else</option>
+        </select>
+
+        <label for="story">Your complaint or note</label>
+        <textarea id="story" name="story" required placeholder="What did you see? Keep it short."></textarea>
+
+        <label for="email">Email (for follow-up, not published)</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" />
+
+        <div class="check">
+          <input id="consent" name="consent_public" type="checkbox" value="yes" />
+          <label for="consent" style="margin:0;font-weight:400">Okay to share this publicly on FairValet (after review). We’ll skip your email.</label>
+        </div>
+
+        <button type="submit">Submit report</button>
+        <p class="note">Reports are reviewed before anything is published. No public naming of a business without moderation.</p>
+      </form>
+    </section>
+
+    <section>
+      <h2>Stories (opted-in)</h2>
+      <p class="note" style="margin-top:0">Published only with consent, after review. Seed examples below — your reports appear here once verified.</p>
+      <div class="stories" id="stories">
+        <div class="story">
+          <strong>“Valet-only surprise when I pulled up.”</strong>
+          <span>Metro Detroit diner · type: felt forced into valet · awaiting more local reports</span>
+        </div>
+        <div class="story">
+          <strong>“Only a few regular spots — otherwise you must do valet.”</strong>
+          <span>Historical Birmingham review pattern · under review</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      FairValet · Consumer movement for fair parking · fairvalet.org
+    </footer>
+  </div>
+  <script>
+    const form = document.getElementById("report");
+    const ok = document.getElementById("ok");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      try {
+        const data = new FormData(form);
+        data.append("consent_public", document.getElementById("consent").checked ? "yes" : "no");
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: data,
+          headers: { Accept: "application/json" }
+        });
+        if (!res.ok) throw new Error("send failed");
+        form.reset();
+        ok.classList.add("show");
+        ok.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch (err) {
+        alert("Couldn’t send right now. Please try again in a moment.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Submit report";
+      }
+    });
+  </script>
+</body>
+</html>
