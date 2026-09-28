@@ -37,6 +37,9 @@ jobs:
             printf "window.FAIRVALET_INTAKE={token:'%s',owner:'vgendelman',repo:'fairvalet-site'};\n" "$INTAKE_TOKEN" > assets/intake-config.js
           fi
 
+      - name: Embed published reports into /reports HTML
+        run: python3 scripts/embed-reports.py
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
