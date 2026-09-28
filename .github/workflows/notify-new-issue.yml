@@ -8,21 +8,18 @@ jobs:
   email:
     runs-on: ubuntu-latest
     steps:
-      - name: Email Vgnoid via Gmail API is not available; use curl FormSubmit fallback
+      - name: Email personal Gmail via FormSubmit
         env:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_URL: ${{ github.event.issue.html_url }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_USER: ${{ github.event.issue.user.login }}
           ISSUE_BODY: ${{ github.event.issue.body }}
-          GMAIL_APP_PASSWORD: ${{ secrets.VGNOID_GMAIL_APP_PASSWORD }}
         run: |
           set -euo pipefail
           python3 << 'PY'
           import json, os, urllib.request
-          # Prefer posting via FormSubmit; if blocked from Actions IPs, log clearly.
           body = os.environ.get("ISSUE_BODY") or ""
-          # Pull a short story excerpt from Details section if present
           excerpt = body
           if "### Details" in body:
               excerpt = body.split("### Details", 1)[1]
@@ -40,7 +37,7 @@ jobs:
           }
           data = json.dumps(payload).encode()
           req = urllib.request.Request(
-              "https://formsubmit.co/ajax/Vgnoid@gmail.com",
+              "https://formsubmit.co/ajax/vgendelman@gmail.com",
               data=data,
               headers={
                   "Content-Type": "application/json",
@@ -55,10 +52,8 @@ jobs:
                   print(r.read().decode())
           except Exception as e:
               print("FormSubmit failed:", e)
-              # Fallback: write a file artifact note — Actions cannot send Gmail without a secret.
-              # If VGNOID_APP style secret exists we'd use SMTP; for now fail the job so it's visible.
               raise SystemExit(
-                  "Could not email via FormSubmit. Set up SMTP secret or rely on Gmail watch. "
+                  "Could not email via FormSubmit. "
                   f"Issue was {os.environ['ISSUE_URL']}"
               )
           PY
