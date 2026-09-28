@@ -198,6 +198,9 @@
         <input type="hidden" name="_template" value="table" />
         <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
 
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required placeholder="Your name" autocomplete="name" />
+
         <label for="venue">Business / venue</label>
         <input id="venue" name="venue" type="text" required placeholder="e.g. Hyde Park Prime, Birmingham" />
 
@@ -315,6 +318,7 @@
       }
       const submitted_at = new Date().toISOString();
       const payload = {
+        name: fields.name,
         venue: fields.venue,
         location: fields.location,
         type: fields.type,
@@ -329,6 +333,7 @@
         "",
         "| Field | Value |",
         "| --- | --- |",
+        `| Name | ${fields.name} |`,
         `| Venue | ${fields.venue} |`,
         `| Location | ${fields.location} |`,
         `| Type | ${fields.type} |`,
@@ -377,6 +382,7 @@
       btn.disabled = true;
       btn.textContent = "Sending…";
       const fields = {
+        name: document.getElementById("name").value.trim(),
         venue: document.getElementById("venue").value.trim(),
         location: document.getElementById("location").value.trim(),
         type: document.getElementById("type").value,
