@@ -4,7 +4,7 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 
 ## Flow
 
-1. **Submit** — The public form creates a GitHub Issue labeled `pending-report` (via a public intake token). FormSubmit email notify is best-effort only and must not block intake.
+1. **Submit** — The public form creates a GitHub Issue labeled `pending-report` (via a public intake token). New-issue email notify (Gmail via Actions) is best-effort only and must not block intake.
 2. **Review** — Open [issues with `pending-report`](https://github.com/vgendelman/fairvalet-site/issues?q=is%3Aissue+label%3Apending-report).
 3. **Approve** — As a repo collaborator/owner, comment exactly:
    ```
@@ -45,7 +45,32 @@ Public JSON fields only: `id`, `name`, `venue`, `location`, `date_shared` (optio
 - `published` — on the site
 - `rejected` — not published
 
-## FormSubmit confirmation
+## New-issue email notify (Gmail / Vgnoid)
+
+When a new issue opens with label `pending-report` or a title starting with `Report:` (titles containing `TEST` are skipped), workflow [`.github/workflows/notify-new-issue.yml`](.github/workflows/notify-new-issue.yml) emails **from** `Vgnoid@gmail.com` **to** `vgendelman@gmail.com` via Gmail SMTP (`dawidd6/action-send-mail`). Failures are non-fatal (logged; intake still succeeds).
+
+### Required repo secret
+
+| Secret | Value |
+| --- | --- |
+| `GMAIL_VGNOID_APP_PASSWORD` | 16-character Gmail **App Password** for `Vgnoid@gmail.com` |
+
+Create the App Password (signed in as Vgnoid):
+
+1. Enable **2-Step Verification** on the Google Account: https://myaccount.google.com/signinoptions/two-step
+2. Open **App passwords**: https://myaccount.google.com/apppasswords (or Security → 2-Step Verification → App passwords)
+3. App name e.g. `FairValet GitHub Notify` → Generate → copy the 16-character password (spaces optional)
+4. Add the repo secret (do not paste the password into chat/issues):
+   ```bash
+   gh secret set GMAIL_VGNOID_APP_PASSWORD --repo vgendelman/fairvalet-site
+   ```
+   Or: repo → Settings → Secrets and variables → Actions → New repository secret → name `GMAIL_VGNOID_APP_PASSWORD`.
+
+Until the secret is set, the workflow skips send and logs a warning; it will not fail the run.
+
+Site-side FormSubmit (if still present on the form) remains optional fire-and-forget and is unrelated to this workflow.
+
+## FormSubmit confirmation (approve path)
 
 On approve, if the issue JSON includes an email, Actions POSTs to `https://formsubmit.co/ajax/{email}`. FormSubmit may require a one-time activation link the first time an address is used; failures are non-fatal.
 
@@ -73,4 +98,4 @@ The `gh` OAuth token used by this environment has scopes `repo`, `gist`, `read:o
    - Run workflow **Deploy GitHub Pages** (or push any commit to `main`)
    - Confirm `https://fairvalet.org/assets/intake-config.js` loads (token injected from `FAIRVALET_INTAKE_TOKEN`)
 
-Until workflows are installed: FormSubmit email still works; auto Issue creation and approve/reject Actions do not.
+Until workflows are installed: auto Issue creation and approve/reject Actions do not run; set `GMAIL_VGNOID_APP_PASSWORD` after workflows are live for new-issue Gmail notify.
