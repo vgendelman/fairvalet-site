@@ -184,7 +184,7 @@
         if (empty) empty.remove();
         root.innerHTML = reports.map((r) => {
           const typeLabel = TYPE_LABELS[r.type] || r.type || "Report";
-          const when = formatDate(r.published_at || r.submitted_at);
+          const when = formatDate(r.date_shared || r.published_at || r.submitted_at);
           const who = r.name ? escapeHtml(r.name) : "";
           return (
             '<article class="story">' +

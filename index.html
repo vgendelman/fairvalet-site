@@ -235,6 +235,9 @@
         <label for="location">City / location</label>
         <input id="location" name="location" type="text" required placeholder="City, state or ZIP" />
 
+        <label for="date_shared">Date shared</label>
+        <input id="date_shared" name="date_shared" type="date" required />
+
         <label for="type">What happened?</label>
         <select id="type" name="type" required>
           <option value="">Choose one…</option>
@@ -274,14 +277,14 @@
     async function createReviewIssue(fields) {
       const cfg = window.FAIRVALET_INTAKE;
       if (!cfg || !cfg.token || !cfg.owner || !cfg.repo) {
-        console.warn("FairValet intake config missing; email notification still sent.");
-        return;
+        throw new Error("FairValet intake config missing");
       }
       const submitted_at = new Date().toISOString();
       const payload = {
         name: fields.name,
         venue: fields.venue,
         location: fields.location,
+        date_shared: fields.date_shared,
         type: fields.type,
         details: fields.story,
         story: fields.story,
@@ -297,6 +300,7 @@
         `| Name | ${fields.name} |`,
         `| Venue | ${fields.venue} |`,
         `| Location | ${fields.location} |`,
+        `| Date shared | ${fields.date_shared} |`,
         `| Type | ${fields.type} |`,
         `| Consent to publish | ${fields.consent_public} |`,
         `| Submitted | ${submitted_at} |`,
@@ -331,7 +335,37 @@
       );
       if (!res.ok) {
         const text = await res.text().catch(() => "");
-        console.warn("Could not create review issue", res.status, text);
+        throw new Error("Could not create review issue: " + res.status + " " + text);
+      }
+    }
+
+    async function notifyFormSubmitBestEffort(actionUrl, fields) {
+      try {
+        const data = new FormData();
+        data.set("_subject", "FairValet report");
+        data.set("_template", "table");
+        data.set("name", fields.name);
+        data.set("venue", fields.venue);
+        data.set("location", fields.location);
+        data.set("date_shared", fields.date_shared);
+        data.set("type", fields.type);
+        data.set("story", fields.story);
+        if (fields.email) data.set("email", fields.email);
+        data.set("consent_public", fields.consent_public);
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        try {
+          await fetch(actionUrl, {
+            method: "POST",
+            body: data,
+            headers: { Accept: "application/json" },
+            signal: controller.signal
+          });
+        } finally {
+          clearTimeout(timer);
+        }
+      } catch (err) {
+        console.warn("FormSubmit notification skipped", err);
       }
     }
 
@@ -346,32 +380,24 @@
         name: document.getElementById("name").value.trim(),
         venue: document.getElementById("venue").value.trim(),
         location: document.getElementById("location").value.trim(),
+        date_shared: document.getElementById("date_shared").value,
         type: document.getElementById("type").value,
         story: document.getElementById("story").value.trim(),
         email: document.getElementById("email").value.trim(),
         consent_public: document.getElementById("consent").checked ? "yes" : "no"
       };
       try {
-        const data = new FormData(form);
-        data.set("consent_public", fields.consent_public);
-        const res = await fetch(form.action, {
-          method: "POST",
-          body: data,
-          headers: { Accept: "application/json" }
-        });
-        if (!res.ok) throw new Error("send failed");
-
-        // Best-effort review queue; email path already succeeded.
-        try {
-          await createReviewIssue(fields);
-        } catch (issueErr) {
-          console.warn("Review issue creation failed", issueErr);
-        }
+        // Primary path: GitHub Issues intake (review queue).
+        await createReviewIssue(fields);
 
         form.reset();
         ok.classList.add("show");
         ok.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+        // Best-effort email notify after success UI; never fails the form.
+        void notifyFormSubmitBestEffort(form.action, fields);
       } catch (err) {
+        console.warn("Report submit failed", err);
         alert("Couldn’t send right now. Please try again in a moment.");
       } finally {
         btn.disabled = false;

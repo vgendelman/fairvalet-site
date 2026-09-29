@@ -4,7 +4,7 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 
 ## Flow
 
-1. **Submit** — The public form posts to FormSubmit (`Vgnoid@gmail.com`) for email notification, then creates a GitHub Issue labeled `pending-report` (via a public intake token).
+1. **Submit** — The public form creates a GitHub Issue labeled `pending-report` (via a public intake token). FormSubmit email notify is best-effort only and must not block intake.
 2. **Review** — Open [issues with `pending-report`](https://github.com/vgendelman/fairvalet-site/issues?q=is%3Aissue+label%3Apending-report).
 3. **Approve** — As a repo collaborator/owner, comment exactly:
    ```
@@ -25,7 +25,7 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 | Published | `data/reports.json` → rendered on https://fairvalet.org/reports/ |
 | Rejected | Closed issues (`rejected`) |
 
-Public JSON fields only: `id`, `name`, `venue`, `location`, `type`, `details`, `submitted_at`, `published_at`, `issue_number`. Never put private email in that file.
+Public JSON fields only: `id`, `name`, `venue`, `location`, `date_shared` (optional; experience/share date from the form), `type`, `details`, `submitted_at`, `published_at`, `issue_number`. The reports page prefers `date_shared`, then `published_at`, then `submitted_at`. Never put private email in that file.
 
 ## Intake token (privacy / spam note)
 
