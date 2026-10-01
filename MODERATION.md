@@ -25,9 +25,19 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 | Published | `data/reports.json` → rendered on https://fairvalet.org/reports/ |
 | Rejected | Closed issues (`rejected`) |
 
-Public JSON fields only: `id`, `name`, `venue`, `location`, `type`, `title` (optional; short complaint/note title from the form), `details`, `submitted_at`, `published_at`, `issue_number`. Older published rows may still include a legacy `date_shared` key; new reports do not collect or persist it. Published cards show: title → note/details → venue/location → name/date (`submitted_at`, else `published_at`). Older reports without `title` fall back to the type label as the heading. Never put private email in that file.
+Public JSON fields only: `id`, `name`, `venue`, `location`, `title` (freeform category/heading from the form), `details`, `want_regulation` (`yes` / `no` / `unsure`), `submitted_at`, `published_at`, `issue_number`. Older published rows may still include legacy `type` and/or `date_shared`; new reports omit `type` (title is the category) and do not collect `date_shared`. Published cards show: title → note/details → regulation line (if present) → venue/location → name/date (`submitted_at`, else `published_at`). Cards do not depend on `type`; older rows without `title` show a generic “Report” heading. Never put private email in that file.
 
 Submitting the public form always implies consent to publish after review (`consent_public` is always `yes` in the issue payload). There is no opt-out checkbox.
+
+## Future: search / sort on /reports
+
+Not built yet. Next step for filters by venue, city, and state:
+
+1. **Split location** on the form into structured fields (at least `city` + `state`, optionally keep a freeform `location` display string). Persist those on publish in `reports.json`.
+2. **Migrate** existing single `location` strings (e.g. parse “West Bloomfield, MI”) when convenient; until then keep the single field so current reports keep working.
+3. **UI** on `/reports/`: client-side filter over `reports.json` — filter chips and/or a search box matching venue / city / state (and optionally title/details). No backend required for a small dataset.
+
+Until then, location stays one text field; do not block intake on structured geo.
 
 ## Intake token (privacy / spam note)
 

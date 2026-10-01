@@ -115,11 +115,18 @@ jobs:
               type: String(payload.type || '').trim(),
               title: String(payload.title || payload.story_title || '').trim(),
               details: String(payload.details || payload.story || '').trim(),
+              want_regulation: String(payload.want_regulation || '').trim().toLowerCase(),
               submitted_at: payload.submitted_at || issue.created_at || now,
               published_at: now,
               issue_number: issueNumber
             };
             if (!report.title) delete report.title;
+            // Keep legacy type if present; omit empty want_regulation / type from new rows.
+            if (!report.type) delete report.type;
+            if (!report.want_regulation) delete report.want_regulation;
+            if (!['yes', 'no', 'unsure'].includes(report.want_regulation || '')) {
+              delete report.want_regulation;
+            }
 
             if (!report.venue || !report.details) {
               await github.rest.issues.createComment({

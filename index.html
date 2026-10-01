@@ -108,6 +108,26 @@
       outline: 2px solid var(--accent-soft);
       border-color: var(--accent);
     }
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1.25rem;
+      margin: 0.15rem 0 1rem;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 400;
+      margin: 0;
+      cursor: pointer;
+    }
+    .radio-option input {
+      width: auto;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
     textarea { min-height: 7rem; resize: vertical; }
     button {
       appearance: none;
@@ -221,20 +241,20 @@
         <label for="location">City / location</label>
         <input id="location" name="location" type="text" required placeholder="City, state or ZIP" />
 
-        <label for="type">What happened?</label>
-        <select id="type" name="type" required>
-          <option value="">Choose one…</option>
-          <option value="front_spaces_reserved">Best spots reserved for valet cars</option>
-          <option value="forced_or_pushed">Felt forced into valet / little self-park choice</option>
-          <option value="good_example">They do valet fairly</option>
-          <option value="other">Something else</option>
-        </select>
-
         <label for="title">Title</label>
         <input id="title" name="title" type="text" required placeholder="Short title for your complaint or note" maxlength="120" />
 
         <label for="story">Your complaint or note</label>
         <textarea id="story" name="story" required placeholder="What did you see? Keep it short."></textarea>
+
+        <fieldset style="border:none;padding:0;margin:0 0 0.15rem">
+          <legend style="font-size:0.9rem;font-weight:500;margin:0 0 0.35rem;padding:0">Should there be regulation for which spots valet can block? <span aria-hidden="true">*</span></legend>
+          <div class="radio-group" role="radiogroup" aria-required="true">
+            <label class="radio-option"><input type="radio" name="want_regulation" value="yes" required /> Yes</label>
+            <label class="radio-option"><input type="radio" name="want_regulation" value="no" /> No</label>
+            <label class="radio-option"><input type="radio" name="want_regulation" value="unsure" /> Unsure</label>
+          </div>
+        </fieldset>
 
         <label for="email">Email (for follow-up, not published)</label>
         <input id="email" name="email" type="email" placeholder="you@example.com" />
@@ -265,10 +285,10 @@
         name: fields.name,
         venue: fields.venue,
         location: fields.location,
-        type: fields.type,
         title: fields.title,
         details: fields.story,
         story: fields.story,
+        want_regulation: fields.want_regulation,
         email: fields.email || "",
         consent_public: "yes",
         submitted_at
@@ -281,8 +301,8 @@
         `| Name | ${fields.name} |`,
         `| Venue | ${fields.venue} |`,
         `| Location | ${fields.location} |`,
-        `| Type | ${fields.type} |`,
         `| Title | ${fields.title} |`,
+        `| Want valet-spot regulation | ${fields.want_regulation} |`,
         `| Consent to publish | yes |`,
         `| Submitted | ${submitted_at} |`,
         "",
@@ -328,9 +348,9 @@
         data.set("name", fields.name);
         data.set("venue", fields.venue);
         data.set("location", fields.location);
-        data.set("type", fields.type);
         data.set("title", fields.title);
         data.set("story", fields.story);
+        data.set("want_regulation", fields.want_regulation);
         if (fields.email) data.set("email", fields.email);
         data.set("consent_public", "yes");
         const controller = new AbortController();
@@ -357,13 +377,14 @@
       const btn = form.querySelector("button");
       btn.disabled = true;
       btn.textContent = "Sending…";
+      const wantReg = form.querySelector('input[name="want_regulation"]:checked');
       const fields = {
         name: document.getElementById("name").value.trim(),
         venue: document.getElementById("venue").value.trim(),
         location: document.getElementById("location").value.trim(),
-        type: document.getElementById("type").value,
         title: document.getElementById("title").value.trim(),
         story: document.getElementById("story").value.trim(),
+        want_regulation: wantReg ? wantReg.value : "",
         email: document.getElementById("email").value.trim(),
         consent_public: "yes"
       };

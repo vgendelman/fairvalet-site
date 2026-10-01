@@ -11,13 +11,11 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "reports.json"
 PAGE = ROOT / "reports" / "index.html"
 
-TYPE_LABELS = {
-    "front_spaces_reserved": "Best spots reserved for valet cars",
-    "forced_or_pushed": "Felt forced into valet / little self-park choice",
-    "cones_or_blocked": "Cones or barriers blocking ordinary parking",
-    "parked_far_anyway": "Paid valet but car still parked far away",
-    "good_example": "They do valet fairly",
-    "other": "Something else",
+# Legacy type keys may still exist on older reports.json rows; cards use title, not type.
+REGULATION_LABELS = {
+    "yes": "Yes",
+    "no": "No",
+    "unsure": "Unsure",
 }
 
 
@@ -36,16 +34,22 @@ def render_articles(reports: list) -> str:
         return '<p class="note" id="reports-empty" style="margin:0">No published reports yet.</p>'
     parts = []
     for r in reports:
-        type_label = TYPE_LABELS.get(r.get("type") or "", r.get("type") or "Report")
         when = format_date(r.get("submitted_at") or r.get("published_at") or "")
         who = escape(str(r.get("name") or "").strip())
         venue = escape(str(r.get("venue") or "").strip())
         location = escape(str(r.get("location") or "").strip())
         details = escape(str(r.get("details") or ""))
         title = escape(str(r.get("title") or "").strip())
-        heading = title or escape(type_label) or "Report"
+        heading = title or "Report"
         place_bits = [b for b in (venue, location) if b]
         byline_bits = [b for b in (who, escape(when) if when else "") if b]
+        reg_raw = str(r.get("want_regulation") or "").strip().lower()
+        reg_label = REGULATION_LABELS.get(reg_raw) or (escape(reg_raw) if reg_raw else "")
+        reg = (
+            f'<span class="report-meta">Supports valet-spot regulation: {reg_label}</span>'
+            if reg_label
+            else ""
+        )
         place = (
             f'<span class="report-meta">{" · ".join(place_bits)}</span>'
             if place_bits
@@ -60,6 +64,7 @@ def render_articles(reports: list) -> str:
             '<article class="story">'
             f"<strong>{heading}</strong>"
             f'<p class="report-details">{details}</p>'
+            f"{reg}"
             f"{place}"
             f"{byline}"
             "</article>"
