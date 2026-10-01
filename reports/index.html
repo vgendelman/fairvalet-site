@@ -145,7 +145,7 @@
       <p class="note" style="margin-top:0">Email addresses are never shown. Business names appear only after review.</p>
       <!-- NEXT: client-side sort/search on /reports by venue, city, state — split location into city+state (or structured fields) in the form + reports.json first; then filter chips or a search box over reports.json. -->
       <div class="stories" id="community-reports">
-        <article class="story"><strong>Nearby spots blocked by valet cones</strong><p class="report-details">A few weeks ago I was meeting friends at West End. When I arrived, all the nearby parking spots were taken up by the valet&#x27;s cones, leaving only spots far from the restaurant. We turned around and went to a different place.</p><span class="report-meta">West End · West Bloomfield, MI</span><span class="report-meta">Alex · 2026-09-28</span></article>
+        <article class="story"><strong>Nearby spots blocked by valet cones</strong><p class="report-details">A few weeks ago I was meeting friends at West End. When I arrived, all the nearby parking spots were taken up by the valet&#x27;s cones, leaving only spots far from the restaurant. We turned around and went to a different place.</p><span class="report-meta">West End · West Bloomfield, MI</span><span class="report-meta">Supports valet-spot regulation: Yes</span><span class="report-meta">Alex · 2026-09-28</span></article>
       </div>
     </section>
 
@@ -214,10 +214,10 @@
             '<article class="story">' +
               "<strong>" + heading + "</strong>" +
               '<p class="report-details">' + escapeHtml(r.details || "") + "</p>" +
-              regLine +
               (placeParts.length
                 ? '<span class="report-meta">' + placeParts.join(" · ") + "</span>"
                 : "") +
+              regLine +
               (bylineParts.length
                 ? '<span class="report-meta">' + bylineParts.join(" · ") + "</span>"
                 : "") +

@@ -64,8 +64,8 @@ def render_articles(reports: list) -> str:
             '<article class="story">'
             f"<strong>{heading}</strong>"
             f'<p class="report-details">{details}</p>'
-            f"{reg}"
             f"{place}"
+            f"{reg}"
             f"{byline}"
             "</article>"
         )
