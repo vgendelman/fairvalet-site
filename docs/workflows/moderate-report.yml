@@ -7,6 +7,8 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
+  id-token: write
 
 jobs:
   moderate:
@@ -112,11 +114,13 @@ jobs:
               location: String(payload.location || '').trim(),
               date_shared: String(payload.date_shared || '').trim(),
               type: String(payload.type || '').trim(),
+              title: String(payload.title || payload.story_title || '').trim(),
               details: String(payload.details || payload.story || '').trim(),
               submitted_at: payload.submitted_at || issue.created_at || now,
               published_at: now,
               issue_number: issueNumber
             };
+            if (!report.title) delete report.title;
 
             if (!report.venue || !report.details) {
               await github.rest.issues.createComment({
@@ -157,7 +161,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: 'Published to the site. It should appear on https://fairvalet.org/reports/ after GitHub Pages rebuilds.'
+              body: 'Published to the site and Pages deploy was started. Live at https://fairvalet.org/reports/ shortly.'
             });
 
             const email = String(payload.email || '').trim();
@@ -168,6 +172,38 @@ jobs:
               core.setOutput('confirm_email', '');
               core.setOutput('confirm_venue', '');
             }
+
+
+      - name: Write intake-config.js for Pages artifact
+        if: steps.gate.outputs.action == 'approve'
+        env:
+          INTAKE_TOKEN: ${{ secrets.FAIRVALET_INTAKE_TOKEN }}
+        run: |
+          mkdir -p assets
+          if [ -z "$INTAKE_TOKEN" ]; then
+            printf "window.FAIRVALET_INTAKE={token:'',owner:'vgendelman',repo:'fairvalet-site'};\n" > assets/intake-config.js
+          else
+            printf "window.FAIRVALET_INTAKE={token:'%s',owner:'vgendelman',repo:'fairvalet-site'};\n" "$INTAKE_TOKEN" > assets/intake-config.js
+          fi
+
+      - name: Embed published reports into /reports HTML
+        if: steps.gate.outputs.action == 'approve'
+        run: python3 scripts/embed-reports.py
+
+      - name: Setup Pages
+        if: steps.gate.outputs.action == 'approve'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: steps.gate.outputs.action == 'approve'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        if: steps.gate.outputs.action == 'approve'
+        id: pages-deployment
+        uses: actions/deploy-pages@v4
 
       - name: Send confirmation email (FormSubmit)
         if: steps.gate.outputs.action == 'approve' && steps.approve.outputs.confirm_email != ''

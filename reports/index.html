@@ -147,7 +147,7 @@
       forced_or_pushed: "Felt forced into valet / little self-park choice",
       cones_or_blocked: "Cones or barriers blocking ordinary parking",
       parked_far_anyway: "Paid valet but car still parked far away",
-      good_example: "They do valet fairly — recognize them",
+      good_example: "They do valet fairly",
       other: "Something else"
     };
 
@@ -186,16 +186,19 @@
           const typeLabel = TYPE_LABELS[r.type] || r.type || "Report";
           const when = formatDate(r.date_shared || r.published_at || r.submitted_at);
           const who = r.name ? escapeHtml(r.name) : "";
+          const title = (r.title || "").trim();
+          const venue = escapeHtml(r.venue || "Venue");
+          const heading = title ? escapeHtml(title) : venue;
+          const metaParts = [];
+          if (who) metaParts.push(who);
+          if (title && r.venue) metaParts.push(venue);
+          if (r.location) metaParts.push(escapeHtml(r.location));
+          if (typeLabel) metaParts.push(escapeHtml(typeLabel));
+          if (when) metaParts.push(escapeHtml(when));
           return (
             '<article class="story">' +
-              "<strong>" + escapeHtml(r.venue || "Venue") + "</strong>" +
-              '<span class="report-meta">' +
-                (who ? who + " · " : "") +
-                escapeHtml(r.location || "") +
-                (r.location && typeLabel ? " · " : "") +
-                escapeHtml(typeLabel) +
-                (when ? " · " + escapeHtml(when) : "") +
-              "</span>" +
+              "<strong>" + heading + "</strong>" +
+              '<span class="report-meta">' + metaParts.join(" · ") + "</span>" +
               '<p class="report-details">' + escapeHtml(r.details || "") + "</p>" +
             "</article>"
           );

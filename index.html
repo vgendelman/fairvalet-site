@@ -109,20 +109,6 @@
       border-color: var(--accent);
     }
     textarea { min-height: 7rem; resize: vertical; }
-    .check {
-      display: flex;
-      gap: 0.65rem;
-      align-items: flex-start;
-      margin: 0.25rem 0 1.15rem;
-      font-size: 0.95rem;
-    }
-    .check input {
-      margin-top: 0.3rem;
-      width: 1.05rem;
-      height: 1.05rem;
-      accent-color: var(--accent);
-      flex-shrink: 0;
-    }
     button {
       appearance: none;
       border: none;
@@ -220,7 +206,7 @@
     <section>
       <h2>Share your experience</h2>
       <p>Seen valet hogging the front spaces — or a place that does it right? Tell us. It takes under a minute.</p>
-      <div id="ok" class="ok" role="status">Thanks — your report was sent. If you opted in, we may publish it after a quick review.</div>
+      <div id="ok" class="ok" role="status">Thanks — your report was sent. We may publish it after a quick review.</div>
       <form id="report" action="https://formsubmit.co/ajax/Vgnoid@gmail.com" method="POST">
         <input type="hidden" name="_subject" value="FairValet report" />
         <input type="hidden" name="_template" value="table" />
@@ -243,11 +229,12 @@
           <option value="">Choose one…</option>
           <option value="front_spaces_reserved">Best spots reserved for valet cars</option>
           <option value="forced_or_pushed">Felt forced into valet / little self-park choice</option>
-          <option value="cones_or_blocked">Cones or barriers blocking ordinary parking</option>
-          <option value="parked_far_anyway">Paid valet but car still parked far away</option>
-          <option value="good_example">They do valet fairly — recognize them</option>
+          <option value="good_example">They do valet fairly</option>
           <option value="other">Something else</option>
         </select>
+
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" required placeholder="Short title for your complaint or note" maxlength="120" />
 
         <label for="story">Your complaint or note</label>
         <textarea id="story" name="story" required placeholder="What did you see? Keep it short."></textarea>
@@ -255,10 +242,7 @@
         <label for="email">Email (for follow-up, not published)</label>
         <input id="email" name="email" type="email" placeholder="you@example.com" />
 
-        <div class="check">
-          <input id="consent" name="consent_public" type="checkbox" value="yes" />
-          <label for="consent" style="margin:0;font-weight:400">Okay to share this publicly on FairValet (after review). We’ll skip your email.</label>
-        </div>
+        <p class="note" style="margin-top:0.35rem;margin-bottom:1.1rem">By submitting, you agree that your report may be posted publicly on FairValet after review. Your email (if provided) is never published.</p>
 
         <button type="submit">Submit report</button>
         <p class="note">Reports are reviewed before anything is published. No public naming of a business without moderation.</p>
@@ -286,10 +270,11 @@
         location: fields.location,
         date_shared: fields.date_shared,
         type: fields.type,
+        title: fields.title,
         details: fields.story,
         story: fields.story,
         email: fields.email || "",
-        consent_public: fields.consent_public,
+        consent_public: "yes",
         submitted_at
       };
       const body = [
@@ -302,7 +287,8 @@
         `| Location | ${fields.location} |`,
         `| Date shared | ${fields.date_shared} |`,
         `| Type | ${fields.type} |`,
-        `| Consent to publish | ${fields.consent_public} |`,
+        `| Title | ${fields.title} |`,
+        `| Consent to publish | yes |`,
         `| Submitted | ${submitted_at} |`,
         "",
         "### Details",
@@ -349,9 +335,10 @@
         data.set("location", fields.location);
         data.set("date_shared", fields.date_shared);
         data.set("type", fields.type);
+        data.set("title", fields.title);
         data.set("story", fields.story);
         if (fields.email) data.set("email", fields.email);
-        data.set("consent_public", fields.consent_public);
+        data.set("consent_public", "yes");
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 8000);
         try {
@@ -382,9 +369,10 @@
         location: document.getElementById("location").value.trim(),
         date_shared: document.getElementById("date_shared").value,
         type: document.getElementById("type").value,
+        title: document.getElementById("title").value.trim(),
         story: document.getElementById("story").value.trim(),
         email: document.getElementById("email").value.trim(),
-        consent_public: document.getElementById("consent").checked ? "yes" : "no"
+        consent_public: "yes"
       };
       try {
         // Primary path: GitHub Issues intake (review queue).

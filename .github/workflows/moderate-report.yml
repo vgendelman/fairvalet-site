@@ -114,11 +114,13 @@ jobs:
               location: String(payload.location || '').trim(),
               date_shared: String(payload.date_shared || '').trim(),
               type: String(payload.type || '').trim(),
+              title: String(payload.title || payload.story_title || '').trim(),
               details: String(payload.details || payload.story || '').trim(),
               submitted_at: payload.submitted_at || issue.created_at || now,
               published_at: now,
               issue_number: issueNumber
             };
+            if (!report.title) delete report.title;
 
             if (!report.venue || !report.details) {
               await github.rest.issues.createComment({

@@ -16,7 +16,7 @@ TYPE_LABELS = {
     "forced_or_pushed": "Felt forced into valet / little self-park choice",
     "cones_or_blocked": "Cones or barriers blocking ordinary parking",
     "parked_far_anyway": "Paid valet but car still parked far away",
-    "good_example": "They do valet fairly — recognize them",
+    "good_example": "They do valet fairly",
     "other": "Something else",
 }
 
@@ -42,9 +42,13 @@ def render_articles(reports: list) -> str:
         venue = escape(str(r.get("venue") or "Venue"))
         location = escape(str(r.get("location") or ""))
         details = escape(str(r.get("details") or ""))
+        title = escape(str(r.get("title") or "").strip())
+        heading = title or venue
         meta_bits = []
         if who:
             meta_bits.append(who)
+        if title and r.get("venue"):
+            meta_bits.append(venue)
         if location:
             meta_bits.append(location)
         if type_label:
@@ -54,7 +58,7 @@ def render_articles(reports: list) -> str:
         meta = " · ".join(meta_bits)
         parts.append(
             '<article class="story">'
-            f"<strong>{venue}</strong>"
+            f"<strong>{heading}</strong>"
             f'<span class="report-meta">{meta}</span>'
             f'<p class="report-details">{details}</p>'
             "</article>"
