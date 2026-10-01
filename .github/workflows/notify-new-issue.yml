@@ -5,7 +5,7 @@ on:
     types: [opened]
 
 jobs:
-  email:
+  email-report:
     runs-on: ubuntu-latest
     # Notify for pending-report labels or titles starting with "Report:".
     # Skip titles that contain TEST (smoke / do-not-publish issues).
@@ -13,6 +13,7 @@ jobs:
       (contains(join(github.event.issue.labels.*.name, ','), 'pending-report')
        || startsWith(github.event.issue.title, 'Report:'))
       && !contains(github.event.issue.title, 'TEST')
+      && !contains(join(github.event.issue.labels.*.name, ','), 'contact')
     steps:
       - name: Prepare message
         id: prep
@@ -101,4 +102,136 @@ jobs:
             echo "Gmail notify sent from Vgnoid@gmail.com to vgendelman@gmail.com"
           else
             echo "::warning::Gmail notify failed (non-fatal). Check App Password / SMTP. Issue was ${{ github.event.issue.html_url }}"
+          fi
+
+  email-contact:
+    runs-on: ubuntu-latest
+    # Notify for contact / pending-contact labels or titles starting with "Contact:".
+    # Skip titles that contain TEST.
+    if: >
+      (contains(join(github.event.issue.labels.*.name, ','), 'contact')
+       || contains(join(github.event.issue.labels.*.name, ','), 'pending-contact')
+       || startsWith(github.event.issue.title, 'Contact:'))
+      && !contains(github.event.issue.title, 'TEST')
+    steps:
+      - name: Prepare contact message
+        id: prep
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          set -euo pipefail
+          python3 << 'PY'
+          import os
+          import json
+          import re
+          from pathlib import Path
+
+          body = os.environ.get("ISSUE_BODY") or ""
+          number = os.environ["ISSUE_NUMBER"]
+          title = os.environ["ISSUE_TITLE"]
+          url = os.environ["ISSUE_URL"]
+
+          name = ""
+          email = ""
+          comments = ""
+
+          # Prefer structured JSON block from the contact form.
+          m = re.search(
+              r"<!-- fairvalet:contact-json -->\s*(\{.*?\})\s*<!-- /fairvalet:contact-json -->",
+              body,
+              re.DOTALL,
+          )
+          if m:
+              try:
+                  data = json.loads(m.group(1))
+                  name = str(data.get("name") or "").strip()
+                  email = str(data.get("email") or "").strip()
+                  comments = str(data.get("comments") or "").strip()
+              except json.JSONDecodeError:
+                  pass
+
+          if not name:
+              mm = re.search(r"\|\s*Name\s*\|\s*(.*?)\s*\|", body)
+              if mm:
+                  name = mm.group(1).strip()
+          if not email:
+              mm = re.search(r"\|\s*Email\s*\|\s*(.*?)\s*\|", body)
+              if mm:
+                  email = mm.group(1).strip()
+          if not comments and "### Comments" in body:
+              comments = body.split("### Comments", 1)[1]
+              if "<!-- fairvalet:contact-json -->" in comments:
+                  comments = comments.split("<!-- fairvalet:contact-json -->", 1)[0]
+              comments = comments.strip()
+
+          name = name or "(unknown)"
+          email = email or "(none)"
+          comments = (comments or "(no comments)").strip()[:2000]
+
+          subject = f"FairValet contact from {name}"
+          if len(subject) > 100:
+              subject = subject[:97] + "..."
+
+          text = "\n".join(
+              [
+                  f"New FairValet contact message (issue #{number})",
+                  "",
+                  f"Name: {name}",
+                  f"Email: {email}",
+                  f"Issue: {url}",
+                  f"Title: {title}",
+                  "",
+                  "Comments:",
+                  comments,
+                  "",
+                  "- FairValet contact notify (GitHub Actions / Vgnoid Gmail → fairvalethq)",
+              ]
+          )
+          Path("body.txt").write_text(text, encoding="utf-8")
+
+          # Multiline-safe subject via GITHUB_OUTPUT
+          out = Path(os.environ["GITHUB_OUTPUT"])
+          with out.open("a", encoding="utf-8") as f:
+              f.write(f"subject={subject}\n")
+          print("Prepared contact notify for", url, "name=", name, "email=", email)
+          PY
+
+      - name: Check Gmail App Password secret
+        id: creds
+        env:
+          PASS: ${{ secrets.GMAIL_VGNOID_APP_PASSWORD }}
+        run: |
+          if [ -z "${PASS}" ]; then
+            echo "missing=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Secret GMAIL_VGNOID_APP_PASSWORD is not set. Skipping Gmail contact notify."
+          else
+            echo "missing=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Send Gmail contact notify (Vgnoid to fairvalethq)
+        if: steps.creds.outputs.missing != 'true'
+        id: send
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v22
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: Vgnoid@gmail.com
+          password: ${{ secrets.GMAIL_VGNOID_APP_PASSWORD }}
+          from: FairValet <Vgnoid@gmail.com>
+          to: fairvalethq@gmail.com
+          subject: ${{ steps.prep.outputs.subject }}
+          body: file://body.txt
+
+      - name: Log send result
+        if: steps.creds.outputs.missing != 'true'
+        run: |
+          if [ "${{ steps.send.outcome }}" = "success" ]; then
+            echo "Contact Gmail notify sent from Vgnoid@gmail.com to fairvalethq@gmail.com"
+          else
+            echo "::warning::Contact Gmail notify failed (non-fatal). Check App Password / SMTP. Issue was ${{ github.event.issue.html_url }}"
           fi

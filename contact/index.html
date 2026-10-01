@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact FairValet — FairValet</title>
+  <meta name="description" content="Contact FairValet with questions, feedback, or partnership ideas about fair valet parking." />
+  <link rel="canonical" href="https://fairvalet.org/contact/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Contact FairValet — FairValet" />
+  <meta property="og:description" content="Contact FairValet with questions, feedback, or partnership ideas about fair valet parking." />
+  <meta property="og:url" content="https://fairvalet.org/contact/" />
+  <meta property="og:site_name" content="FairValet" />
+  <meta property="og:image" content="https://fairvalet.org/assets/fairvalet-logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Contact FairValet — FairValet" />
+  <meta name="twitter:description" content="Contact FairValet with questions, feedback, or partnership ideas about fair valet parking." />
+  <meta name="twitter:image" content="https://fairvalet.org/assets/fairvalet-logo.png" />
+  <link rel="icon" href="../assets/favicon.ico" sizes="any" />
+  <link rel="icon" href="../assets/favicon.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="../assets/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="../assets/favicon-16.png" type="image/png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" sizes="180x180" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1f2e;
+      --muted: #5c6578;
+      --line: #e4e7ee;
+      --bg: #fafbfc;
+      --card: #ffffff;
+      --accent: #0179d6;
+      --accent-soft: #e8f3fc;
+      --warn: #8a4b08;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+      font-size: 1.05rem;
+    }
+    .wrap {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+    header { margin-bottom: 2.5rem; }
+    .mark {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      text-decoration: none;
+      line-height: 0;
+    }
+    .mark img {
+      display: block;
+      width: min(100%, 18rem);
+      height: auto;
+    }
+    h1 {
+      font-size: clamp(1.75rem, 4.5vw, 2.25rem);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin: 1.25rem 0 0.75rem;
+      font-weight: 700;
+    }
+    .lede {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin: 0;
+    }
+    .nav-links {
+      margin: 1rem 0 0;
+      font-size: 0.95rem;
+    }
+    .nav-links a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .nav-links a:hover { text-decoration: underline; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.5rem 1.35rem;
+      margin-bottom: 1.25rem;
+    }
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 0.85rem;
+      letter-spacing: -0.01em;
+    }
+    p { margin: 0 0 0.9rem; }
+    p:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: 0 0 0.35rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 0.55rem;
+      padding: 0.7rem 0.8rem;
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+      margin-bottom: 1rem;
+    }
+    input:focus, textarea:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+    textarea { min-height: 7rem; resize: vertical; }
+    button {
+      appearance: none;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.8rem 1.25rem;
+      border-radius: 0.55rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { filter: brightness(1.05); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.85rem;
+    }
+    .ok {
+      display: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .ok.show { display: block; }
+    footer {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="mark" href="/" aria-label="FairValet home">
+        <img src="../assets/fairvalet-logo.png" width="288" height="288" alt="FairValet — Valet should save you a walk, not make everyone else walk farther." />
+      </a>
+      <h1>Contact us</h1>
+      <p class="lede">Questions, feedback, or partnership ideas — we read every message.</p>
+      <p class="nav-links"><a href="/">← Back to FairValet home</a> · <a href="/reports/">Published reports</a></p>
+    </header>
+
+    <section>
+      <h2>Send a message</h2>
+      <div id="ok" class="ok" role="status">Thanks — your message was sent. We’ll get back to you soon.</div>
+      <form id="contact" action="https://formsubmit.co/ajax/Vgnoid@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="FairValet contact" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+
+        <label for="name">Name <span aria-hidden="true">*</span></label>
+        <input id="name" name="name" type="text" required placeholder="Your name" autocomplete="name" maxlength="120" />
+
+        <label for="email">Email <span aria-hidden="true">*</span></label>
+        <input id="email" name="email" type="email" required placeholder="you@example.com" autocomplete="email" />
+
+        <label for="comments">Comments <span aria-hidden="true">*</span></label>
+        <textarea id="comments" name="comments" required placeholder="How can we help?" maxlength="5000"></textarea>
+
+        <button type="submit">Send message</button>
+        <p class="note">We use your email only to reply. It is never published.</p>
+      </form>
+    </section>
+
+    <footer>
+      FairValet · Consumer movement for fair parking · <a href="/">fairvalet.org</a>
+    </footer>
+  </div>
+  <script src="../assets/intake-config.js" onerror="console.warn('FairValet intake config not loaded')"></script>
+  <script>
+    async function createContactIssue(fields) {
+      const cfg = window.FAIRVALET_INTAKE;
+      if (!cfg || !cfg.token || !cfg.owner || !cfg.repo) {
+        throw new Error("FairValet intake config missing");
+      }
+      const submitted_at = new Date().toISOString();
+      const payload = {
+        name: fields.name,
+        email: fields.email,
+        comments: fields.comments,
+        submitted_at
+      };
+      const body = [
+        "## FairValet contact message",
+        "",
+        "| Field | Value |",
+        "| --- | --- |",
+        `| Name | ${fields.name} |`,
+        `| Email | ${fields.email} |`,
+        `| Submitted | ${submitted_at} |`,
+        "",
+        "### Comments",
+        "",
+        fields.comments,
+        "",
+        "<!-- fairvalet:contact-json -->",
+        JSON.stringify(payload, null, 2),
+        "<!-- /fairvalet:contact-json -->"
+      ].join("\n");
+
+      const res = await fetch(
+        `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/issues`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + cfg.token,
+            Accept: "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "X-GitHub-Api-Version": "2022-11-28"
+          },
+          body: JSON.stringify({
+            title: `Contact: ${fields.name}`,
+            body,
+            labels: ["contact"]
+          })
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error("Could not create contact issue: " + res.status + " " + text);
+      }
+    }
+
+    async function notifyFormSubmitBestEffort(actionUrl, fields) {
+      try {
+        const data = new FormData();
+        data.set("_subject", "FairValet contact");
+        data.set("_template", "table");
+        data.set("name", fields.name);
+        data.set("email", fields.email);
+        data.set("comments", fields.comments);
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        try {
+          await fetch(actionUrl, {
+            method: "POST",
+            body: data,
+            headers: { Accept: "application/json" },
+            signal: controller.signal
+          });
+        } finally {
+          clearTimeout(timer);
+        }
+      } catch (err) {
+        console.warn("FormSubmit notification skipped", err);
+      }
+    }
+
+    const form = document.getElementById("contact");
+    const ok = document.getElementById("ok");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      const fields = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        comments: document.getElementById("comments").value.trim()
+      };
+      try {
+        await createContactIssue(fields);
+        form.reset();
+        ok.classList.add("show");
+        ok.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        void notifyFormSubmitBestEffort(form.action, fields);
+      } catch (err) {
+        console.warn("Contact submit failed", err);
+        alert("Couldn’t send right now. Please try again in a moment.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send message";
+      }
+    });
+  </script>
+</body>
+</html>
