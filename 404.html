@@ -6,15 +6,24 @@
   <title>Page not found — FairValet</title>
   <meta name="robots" content="noindex" />
   <style>
-    body { margin: 0; padding: 3rem 1.25rem; font: 1.05rem/1.55 system-ui, sans-serif; color: #1a1f2e; background: #fafbfc; }
-    main { max-width: 40rem; margin: 0 auto; }
+    body { margin: 0; padding: 1.25rem; font: 1.05rem/1.55 system-ui, sans-serif; color: #1a1f2e; background: #fafbfc; }
+    main { max-width: 40rem; margin: 0 auto; position: relative; }
     a { color: #0179d6; }
+    .chrome {
+      position: relative;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin: 0 0 1.25rem;
+      min-height: 2.5rem;
+      z-index: 30;
+    }
     .menu-toggle {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.55rem;
-      margin: 1rem 0;
+      margin: 0;
       min-width: 7rem;
       border: 1px solid #e4e7ee;
       background: #fff;
@@ -30,34 +39,62 @@
     .menu-icon { display: grid; gap: 3px; }
     .menu-icon span { display: block; width: 1rem; height: 2px; background: currentColor; border-radius: 2px; }
     .site-nav {
+      position: absolute;
+      top: calc(100% + 0.4rem);
+      left: 0;
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem 0.9rem;
-      margin-bottom: 1.5rem;
-      padding: 0.65rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.2rem;
+      width: min(18.5rem, calc(100vw - 2.5rem));
+      margin: 0;
+      padding: 0.75rem 0.9rem;
       border: 1px solid #e4e7ee;
       border-radius: 0.75rem;
       background: #fff;
+      box-shadow: 0 10px 28px rgba(26, 31, 46, 0.1);
+      z-index: 40;
     }
     .site-nav[hidden] { display: none; }
-    .site-nav a { font-weight: 600; text-decoration: none; }
+    .site-nav a { font-weight: 600; text-decoration: none; padding: 0.3rem 0.15rem; }
     .site-nav a:hover { text-decoration: underline; }
+    .nav-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #5c6578;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 0.45rem;
+      padding-top: 0.55rem;
+      border-top: 1px solid #e4e7ee;
+    }
   </style>
 </head>
 <body>
   <main>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-      Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-    </button>
-    <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
-      <a href="/">Home</a>
-      <a href="/reports/">Reports</a>
-      <a href="/contact/">Contact</a>
-    </nav>
+    <div class="chrome">
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
+        <a href="/">Home</a>
+        <a href="/reports/">Reports</a>
+        <a href="/contact/">Contact</a>
+        <a href="/#report">Report an experience</a>
+        <span class="nav-label">Explainers</span>
+        <a href="/what-is-fair-valet/">What is fair valet</a>
+        <a href="/why-valets-cone-front-spots/">Why valets cone spots</a>
+        <a href="/valet-vs-self-park/">Valet vs self-park</a>
+        <a href="/valet-blocking-rules/">Blocking rules</a>
+        <a href="/how-to-report/">How to report</a>
+        <a href="/policy-template/">Policy template</a>
+      </nav>
+    </div>
     <h1>Page not found</h1>
     <p>That FairValet page does not exist.</p>
     <p><a href="/">Return to FairValet home</a></p>
   </main>
+
 
   <script>
     const menuToggle = document.querySelector(".menu-toggle");
@@ -76,5 +113,6 @@
       });
     }
   </script>
+
 </body>
 </html>

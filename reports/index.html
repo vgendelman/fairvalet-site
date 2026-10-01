@@ -47,7 +47,7 @@
     .wrap {
       max-width: 40rem;
       margin: 0 auto;
-      padding: 2.5rem 1.25rem 4rem;
+      padding: 1.25rem 1.25rem 4rem;
     }
     header { margin-bottom: 2.5rem; }
     .mark {
@@ -76,12 +76,22 @@
       margin: 0;
     }
 
+
+    .chrome {
+      position: relative;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin: 0 0 1rem;
+      min-height: 2.5rem;
+      z-index: 30;
+    }
     .menu-toggle {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.55rem;
-      margin: 1rem auto 0;
+      margin: 0;
       width: auto;
       min-width: 7rem;
       border: 1px solid var(--line);
@@ -98,19 +108,41 @@
     .menu-icon { display: grid; gap: 3px; }
     .menu-icon span { display: block; width: 1rem; height: 2px; background: currentColor; border-radius: 2px; }
     .site-nav {
+      position: absolute;
+      top: calc(100% + 0.4rem);
+      left: 0;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.4rem 0.9rem;
-      margin: 0.65rem 0 0;
-      padding: 0.65rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.2rem;
+      width: min(18.5rem, calc(100vw - 2.5rem));
+      margin: 0;
+      padding: 0.75rem 0.9rem;
       border: 1px solid var(--line);
       border-radius: 0.75rem;
       background: var(--card);
+      box-shadow: 0 10px 28px rgba(26, 31, 46, 0.1);
+      z-index: 40;
     }
     .site-nav[hidden] { display: none; }
-    .site-nav a { color: var(--accent); font-size: 0.95rem; font-weight: 600; text-decoration: none; }
+    .site-nav a {
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.3rem 0.15rem;
+    }
     .site-nav a:hover { text-decoration: underline; }
+    .nav-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 0.45rem;
+      padding-top: 0.55rem;
+      border-top: 1px solid var(--line);
+    }
     section {
       background: var(--card);
       border: 1px solid var(--line);
@@ -138,6 +170,17 @@
       background: var(--bg);
     }
     .story strong { display: block; margin-bottom: 0.25rem; font-size: 0.95rem; }
+    .story a.story-title { color: var(--ink); text-decoration: none; }
+    .story a.story-title:hover { color: var(--accent); text-decoration: underline; }
+    .read-more {
+      display: inline-block;
+      margin-top: 0.55rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .read-more:hover { text-decoration: underline; }
     .report-meta {
       color: var(--muted);
       font-size: 0.85rem;
@@ -158,27 +201,38 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="mark" href="/" aria-label="FairValet home">
+      
+      <div class="chrome">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+        <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
+          <a href="/">Home</a>
+          <a href="/reports/">Reports</a>
+          <a href="/contact/">Contact</a>
+          <a href="/#report">Report an experience</a>
+          <span class="nav-label">Explainers</span>
+          <a href="/what-is-fair-valet/">What is fair valet</a>
+          <a href="/why-valets-cone-front-spots/">Why valets cone spots</a>
+          <a href="/valet-vs-self-park/">Valet vs self-park</a>
+          <a href="/valet-blocking-rules/">Blocking rules</a>
+          <a href="/how-to-report/">How to report</a>
+          <a href="/policy-template/">Policy template</a>
+        </nav>
+      </div>
+<a class="mark" href="/" aria-label="FairValet home">
         <img src="../assets/fairvalet-logo.png" width="288" height="288" alt="FairValet — Valet should save you a walk, not make everyone else walk farther." />
       </a>
       <h1>Published reports</h1>
       <p class="lede">Community experiences with valet parking, published only after moderator review.</p>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-        Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-      </button>
-      <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
-        <a href="/">Home</a>
-        <a href="/reports/">Reports</a>
-        <a href="/contact/">Contact</a>
-      </nav>
-    </header>
+</header>
 
     <section>
       <h2>Community reports</h2>
       <p class="note" style="margin-top:0">Email addresses are never shown. Business names appear only after review.</p>
       <!-- NEXT: client-side sort/search on /reports by venue, city, state — split location into city+state (or structured fields) in the form + reports.json first; then filter chips or a search box over reports.json. -->
       <div class="stories" id="community-reports">
-        <article class="story"><strong>Nearby spots blocked by valet cones</strong><p class="report-details">A few weeks ago I was meeting friends at West End. When I arrived, all the nearby parking spots were taken up by the valet&#x27;s cones, leaving only spots far from the restaurant. We turned around and went to a different place.</p><span class="report-meta">West End · West Bloomfield, MI</span><span class="report-meta">Supports valet-spot regulation: Yes</span><span class="report-meta">Alex · 2026-09-28</span></article>
+        <article class="story"><strong><a class="story-title" href="/reports/nearby-spots-blocked-by-valet-cones-west-end/">Nearby spots blocked by valet cones</a></strong><p class="report-details">A few weeks ago I was meeting friends at West End. When I arrived, all the nearby parking spots were taken up by the valet&#x27;s cones, leaving only spots far from the restaurant. We…</p><span class="report-meta">West End · West Bloomfield, MI</span><span class="report-meta">Supports valet-spot regulation: Yes</span><span class="report-meta">Alex · 2026-09-28</span><a class="read-more" href="/reports/nearby-spots-blocked-by-valet-cones-west-end/">Read full report →</a></article>
       </div>
     </section>
 
@@ -232,6 +286,8 @@
           const venue = escapeHtml(r.venue || "");
           const location = escapeHtml(r.location || "");
           const heading = title ? escapeHtml(title) : "Report";
+          const slug = String(r.slug || "").trim();
+          const href = slug ? ("/reports/" + encodeURIComponent(slug) + "/") : "/reports/";
           const placeParts = [];
           if (venue) placeParts.push(venue);
           if (location) placeParts.push(location);
@@ -243,10 +299,14 @@
           const regLine = regLabel
             ? '<span class="report-meta">Supports valet-spot regulation: ' + regLabel + "</span>"
             : "";
+          const details = String(r.details || "");
+          const teaser = details.length > 180
+            ? details.slice(0, 179).replace(/\s+\S*$/, "") + "…"
+            : details;
           return (
             '<article class="story">' +
-              "<strong>" + heading + "</strong>" +
-              '<p class="report-details">' + escapeHtml(r.details || "") + "</p>" +
+              '<strong><a class="story-title" href="' + href + '">' + heading + "</a></strong>" +
+              '<p class="report-details">' + escapeHtml(teaser) + "</p>" +
               (placeParts.length
                 ? '<span class="report-meta">' + placeParts.join(" · ") + "</span>"
                 : "") +
@@ -254,6 +314,7 @@
               (bylineParts.length
                 ? '<span class="report-meta">' + bylineParts.join(" · ") + "</span>"
                 : "") +
+              '<a class="read-more" href="' + href + '">Read full report →</a>' +
             "</article>"
           );
         }).join("");
@@ -265,6 +326,7 @@
 
     loadCommunityReports();
   </script>
+
 
   <script>
     const menuToggle = document.querySelector(".menu-toggle");
@@ -283,5 +345,6 @@
       });
     }
   </script>
+
 </body>
 </html>
