@@ -228,17 +228,42 @@
       text-decoration: none;
     }
     .reports-cta:hover { text-decoration: underline; }
-    .header-nav {
-      margin: 1rem 0 0;
-      text-align: center;
-      font-size: 0.95rem;
-    }
-    .header-nav a {
-      color: var(--accent);
+
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin: 1rem auto 0;
+      width: auto;
+      min-width: 7rem;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.9rem;
       font-weight: 600;
-      text-decoration: none;
+      padding: 0.55rem 0.8rem;
+      border-radius: 0.55rem;
+      cursor: pointer;
     }
-    .header-nav a:hover { text-decoration: underline; }
+    .menu-toggle:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+    .menu-icon { display: grid; gap: 3px; }
+    .menu-icon span { display: block; width: 1rem; height: 2px; background: currentColor; border-radius: 2px; }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem 0.9rem;
+      margin: 0.65rem 0 0;
+      padding: 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      background: var(--card);
+    }
+    .site-nav[hidden] { display: none; }
+    .site-nav a { color: var(--accent); font-size: 0.95rem; font-weight: 600; text-decoration: none; }
+    .site-nav a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -249,7 +274,15 @@
       </a>
       <h1>Valet should save you a walk — not make everyone else walk farther.</h1>
       <p class="lede">A consumer movement for fair valet parking at restaurants, hotels, malls, and venues.</p>
-      <p class="header-nav"><a href="/reports/">Read published reports</a> · <a href="/contact/">Contact</a></p>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
+        <a href="/">Home</a>
+        <a href="/reports/">Reports</a>
+        <a href="/contact/">Contact</a>
+        <a href="#report">Report an experience</a>
+      </nav>
     </header>
 
     <section>
@@ -306,7 +339,7 @@
 
 
     <footer>
-      FairValet · Consumer movement for fair parking · <a href="/contact/">Contact</a>
+      FairValet · Consumer movement for fair parking
     </footer>
   </div>
   <script src="assets/intake-config.js" onerror="console.warn('FairValet intake config not loaded')"></script>
@@ -443,6 +476,24 @@
       }
     });
 
+  </script>
+
+  <script>
+    const menuToggle = document.querySelector(".menu-toggle");
+    const siteNav = document.getElementById("site-nav");
+    if (menuToggle && siteNav) {
+      menuToggle.addEventListener("click", () => {
+        const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+        menuToggle.setAttribute("aria-expanded", String(!isOpen));
+        siteNav.hidden = isOpen;
+      });
+      siteNav.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          menuToggle.setAttribute("aria-expanded", "false");
+          siteNav.hidden = true;
+        }
+      });
+    }
   </script>
 </body>
 </html>

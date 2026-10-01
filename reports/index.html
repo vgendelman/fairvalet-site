@@ -75,16 +75,42 @@
       font-size: 1.1rem;
       margin: 0;
     }
-    .nav-links {
-      margin: 1rem 0 0;
-      font-size: 0.95rem;
-    }
-    .nav-links a {
-      color: var(--accent);
+
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin: 1rem auto 0;
+      width: auto;
+      min-width: 7rem;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.9rem;
       font-weight: 600;
-      text-decoration: none;
+      padding: 0.55rem 0.8rem;
+      border-radius: 0.55rem;
+      cursor: pointer;
     }
-    .nav-links a:hover { text-decoration: underline; }
+    .menu-toggle:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+    .menu-icon { display: grid; gap: 3px; }
+    .menu-icon span { display: block; width: 1rem; height: 2px; background: currentColor; border-radius: 2px; }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem 0.9rem;
+      margin: 0.65rem 0 0;
+      padding: 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      background: var(--card);
+    }
+    .site-nav[hidden] { display: none; }
+    .site-nav a { color: var(--accent); font-size: 0.95rem; font-weight: 600; text-decoration: none; }
+    .site-nav a:hover { text-decoration: underline; }
     section {
       background: var(--card);
       border: 1px solid var(--line);
@@ -137,7 +163,14 @@
       </a>
       <h1>Published reports</h1>
       <p class="lede">Community experiences with valet parking, published only after moderator review.</p>
-      <p class="nav-links"><a href="/">← Back to FairValet home</a> · <a href="/contact/">Contact</a></p>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
+        <a href="/">Home</a>
+        <a href="/reports/">Reports</a>
+        <a href="/contact/">Contact</a>
+      </nav>
     </header>
 
     <section>
@@ -231,6 +264,24 @@
     }
 
     loadCommunityReports();
+  </script>
+
+  <script>
+    const menuToggle = document.querySelector(".menu-toggle");
+    const siteNav = document.getElementById("site-nav");
+    if (menuToggle && siteNav) {
+      menuToggle.addEventListener("click", () => {
+        const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+        menuToggle.setAttribute("aria-expanded", String(!isOpen));
+        siteNav.hidden = isOpen;
+      });
+      siteNav.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          menuToggle.setAttribute("aria-expanded", "false");
+          siteNav.hidden = true;
+        }
+      });
+    }
   </script>
 </body>
 </html>

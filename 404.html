@@ -9,13 +9,72 @@
     body { margin: 0; padding: 3rem 1.25rem; font: 1.05rem/1.55 system-ui, sans-serif; color: #1a1f2e; background: #fafbfc; }
     main { max-width: 40rem; margin: 0 auto; }
     a { color: #0179d6; }
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin: 1rem 0;
+      min-width: 7rem;
+      border: 1px solid #e4e7ee;
+      background: #fff;
+      color: #1a1f2e;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.55rem 0.8rem;
+      border-radius: 0.55rem;
+      cursor: pointer;
+    }
+    .menu-toggle:hover { border-color: #0179d6; color: #0179d6; }
+    .menu-icon { display: grid; gap: 3px; }
+    .menu-icon span { display: block; width: 1rem; height: 2px; background: currentColor; border-radius: 2px; }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.9rem;
+      margin-bottom: 1.5rem;
+      padding: 0.65rem;
+      border: 1px solid #e4e7ee;
+      border-radius: 0.75rem;
+      background: #fff;
+    }
+    .site-nav[hidden] { display: none; }
+    .site-nav a { font-weight: 600; text-decoration: none; }
+    .site-nav a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <main>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      Menu <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation" hidden>
+      <a href="/">Home</a>
+      <a href="/reports/">Reports</a>
+      <a href="/contact/">Contact</a>
+    </nav>
     <h1>Page not found</h1>
     <p>That FairValet page does not exist.</p>
     <p><a href="/">Return to FairValet home</a></p>
   </main>
+
+  <script>
+    const menuToggle = document.querySelector(".menu-toggle");
+    const siteNav = document.getElementById("site-nav");
+    if (menuToggle && siteNav) {
+      menuToggle.addEventListener("click", () => {
+        const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+        menuToggle.setAttribute("aria-expanded", String(!isOpen));
+        siteNav.hidden = isOpen;
+      });
+      siteNav.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          menuToggle.setAttribute("aria-expanded", "false");
+          siteNav.hidden = true;
+        }
+      });
+    }
+  </script>
 </body>
 </html>
