@@ -39,28 +39,29 @@ def render_articles(reports: list) -> str:
         type_label = TYPE_LABELS.get(r.get("type") or "", r.get("type") or "Report")
         when = format_date(r.get("date_shared") or r.get("published_at") or r.get("submitted_at") or "")
         who = escape(str(r.get("name") or "").strip())
-        venue = escape(str(r.get("venue") or "Venue"))
-        location = escape(str(r.get("location") or ""))
+        venue = escape(str(r.get("venue") or "").strip())
+        location = escape(str(r.get("location") or "").strip())
         details = escape(str(r.get("details") or ""))
         title = escape(str(r.get("title") or "").strip())
-        heading = title or venue
-        meta_bits = []
-        if who:
-            meta_bits.append(who)
-        if title and r.get("venue"):
-            meta_bits.append(venue)
-        if location:
-            meta_bits.append(location)
-        if type_label:
-            meta_bits.append(escape(type_label))
-        if when:
-            meta_bits.append(escape(when))
-        meta = " · ".join(meta_bits)
+        heading = title or escape(type_label) or "Report"
+        place_bits = [b for b in (venue, location) if b]
+        byline_bits = [b for b in (who, escape(when) if when else "") if b]
+        place = (
+            f'<span class="report-meta">{" · ".join(place_bits)}</span>'
+            if place_bits
+            else ""
+        )
+        byline = (
+            f'<span class="report-meta">{" · ".join(byline_bits)}</span>'
+            if byline_bits
+            else ""
+        )
         parts.append(
             '<article class="story">'
             f"<strong>{heading}</strong>"
-            f'<span class="report-meta">{meta}</span>'
             f'<p class="report-details">{details}</p>'
+            f"{place}"
+            f"{byline}"
             "</article>"
         )
     return "\n        ".join(parts)

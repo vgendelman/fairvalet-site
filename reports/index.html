@@ -187,19 +187,25 @@
           const when = formatDate(r.date_shared || r.published_at || r.submitted_at);
           const who = r.name ? escapeHtml(r.name) : "";
           const title = (r.title || "").trim();
-          const venue = escapeHtml(r.venue || "Venue");
-          const heading = title ? escapeHtml(title) : venue;
-          const metaParts = [];
-          if (who) metaParts.push(who);
-          if (title && r.venue) metaParts.push(venue);
-          if (r.location) metaParts.push(escapeHtml(r.location));
-          if (typeLabel) metaParts.push(escapeHtml(typeLabel));
-          if (when) metaParts.push(escapeHtml(when));
+          const venue = escapeHtml(r.venue || "");
+          const location = escapeHtml(r.location || "");
+          const heading = title ? escapeHtml(title) : (typeLabel ? escapeHtml(typeLabel) : "Report");
+          const placeParts = [];
+          if (venue) placeParts.push(venue);
+          if (location) placeParts.push(location);
+          const bylineParts = [];
+          if (who) bylineParts.push(who);
+          if (when) bylineParts.push(escapeHtml(when));
           return (
             '<article class="story">' +
               "<strong>" + heading + "</strong>" +
-              '<span class="report-meta">' + metaParts.join(" · ") + "</span>" +
               '<p class="report-details">' + escapeHtml(r.details || "") + "</p>" +
+              (placeParts.length
+                ? '<span class="report-meta">' + placeParts.join(" · ") + "</span>"
+                : "") +
+              (bylineParts.length
+                ? '<span class="report-meta">' + bylineParts.join(" · ") + "</span>"
+                : "") +
             "</article>"
           );
         }).join("");
