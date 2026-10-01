@@ -37,7 +37,7 @@ def render_articles(reports: list) -> str:
     parts = []
     for r in reports:
         type_label = TYPE_LABELS.get(r.get("type") or "", r.get("type") or "Report")
-        when = format_date(r.get("date_shared") or r.get("published_at") or r.get("submitted_at") or "")
+        when = format_date(r.get("submitted_at") or r.get("published_at") or "")
         who = escape(str(r.get("name") or "").strip())
         venue = escape(str(r.get("venue") or "").strip())
         location = escape(str(r.get("location") or "").strip())

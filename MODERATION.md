@@ -25,7 +25,7 @@ Free pipeline using GitHub Issues + Actions + Pages. No paid services.
 | Published | `data/reports.json` → rendered on https://fairvalet.org/reports/ |
 | Rejected | Closed issues (`rejected`) |
 
-Public JSON fields only: `id`, `name`, `venue`, `location`, `date_shared` (optional; experience/share date from the form), `type`, `title` (optional; short complaint/note title from the form), `details`, `submitted_at`, `published_at`, `issue_number`. The reports page prefers `date_shared`, then `published_at`, then `submitted_at`. Published cards show: title → note/details → venue/location → name/date (`date_shared`, else `published_at`/`submitted_at`). Older reports without `title` fall back to the type label as the heading. Never put private email in that file.
+Public JSON fields only: `id`, `name`, `venue`, `location`, `type`, `title` (optional; short complaint/note title from the form), `details`, `submitted_at`, `published_at`, `issue_number`. Older published rows may still include a legacy `date_shared` key; new reports do not collect or persist it. Published cards show: title → note/details → venue/location → name/date (`submitted_at`, else `published_at`). Older reports without `title` fall back to the type label as the heading. Never put private email in that file.
 
 Submitting the public form always implies consent to publish after review (`consent_public` is always `yes` in the issue payload). There is no opt-out checkbox.
 

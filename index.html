@@ -221,9 +221,6 @@
         <label for="location">City / location</label>
         <input id="location" name="location" type="text" required placeholder="City, state or ZIP" />
 
-        <label for="date_shared">Date shared</label>
-        <input id="date_shared" name="date_shared" type="date" required />
-
         <label for="type">What happened?</label>
         <select id="type" name="type" required>
           <option value="">Choose one…</option>
@@ -268,7 +265,6 @@
         name: fields.name,
         venue: fields.venue,
         location: fields.location,
-        date_shared: fields.date_shared,
         type: fields.type,
         title: fields.title,
         details: fields.story,
@@ -285,7 +281,6 @@
         `| Name | ${fields.name} |`,
         `| Venue | ${fields.venue} |`,
         `| Location | ${fields.location} |`,
-        `| Date shared | ${fields.date_shared} |`,
         `| Type | ${fields.type} |`,
         `| Title | ${fields.title} |`,
         `| Consent to publish | yes |`,
@@ -333,7 +328,6 @@
         data.set("name", fields.name);
         data.set("venue", fields.venue);
         data.set("location", fields.location);
-        data.set("date_shared", fields.date_shared);
         data.set("type", fields.type);
         data.set("title", fields.title);
         data.set("story", fields.story);
@@ -367,7 +361,6 @@
         name: document.getElementById("name").value.trim(),
         venue: document.getElementById("venue").value.trim(),
         location: document.getElementById("location").value.trim(),
-        date_shared: document.getElementById("date_shared").value,
         type: document.getElementById("type").value,
         title: document.getElementById("title").value.trim(),
         story: document.getElementById("story").value.trim(),

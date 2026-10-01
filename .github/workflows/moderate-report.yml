@@ -112,7 +112,6 @@ jobs:
               name: String(payload.name || '').trim(),
               venue: String(payload.venue || '').trim(),
               location: String(payload.location || '').trim(),
-              date_shared: String(payload.date_shared || '').trim(),
               type: String(payload.type || '').trim(),
               title: String(payload.title || payload.story_title || '').trim(),
               details: String(payload.details || payload.story || '').trim(),
