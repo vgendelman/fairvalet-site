@@ -79,7 +79,7 @@ jobs:
             echo "missing=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Send Gmail notify (Vgnoid to vgendelman)
+      - name: Send Gmail notify (Vgnoid to vgendelman, CC fairvalethq)
         if: steps.creds.outputs.missing != 'true'
         id: send
         continue-on-error: true
@@ -92,6 +92,7 @@ jobs:
           password: ${{ secrets.GMAIL_VGNOID_APP_PASSWORD }}
           from: FairValet <Vgnoid@gmail.com>
           to: vgendelman@gmail.com
+          cc: fairvalethq@gmail.com
           subject: ${{ steps.prep.outputs.subject }}
           body: file://body.txt
 
@@ -99,7 +100,7 @@ jobs:
         if: steps.creds.outputs.missing != 'true'
         run: |
           if [ "${{ steps.send.outcome }}" = "success" ]; then
-            echo "Gmail notify sent from Vgnoid@gmail.com to vgendelman@gmail.com"
+            echo "Gmail notify sent from Vgnoid@gmail.com to vgendelman@gmail.com (cc fairvalethq@gmail.com)"
           else
             echo "::warning::Gmail notify failed (non-fatal). Check App Password / SMTP. Issue was ${{ github.event.issue.html_url }}"
           fi
